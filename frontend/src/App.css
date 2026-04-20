@@ -1,0 +1,187 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  --primary: #4F46E5;
+  --primary-hover: #4338CA;
+  --bg-gradient: linear-gradient(135deg, #f0f4fd 0%, #e2e8f0 100%);
+  --surface: rgba(255, 255, 255, 0.9);
+  --glass: rgba(255, 255, 255, 0.85);
+  --text-main: #1F2937;
+  --text-muted: #6B7280;
+  --border: rgba(255, 255, 255, 0.5);
+  --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color: var(--text-main);
+  background: var(--bg-gradient);
+  -webkit-font-smoothing: antialiased;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+button {
+  font-family: inherit;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+button:active {
+  transform: scale(0.97);
+}
+
+input {
+  font-family: inherit;
+}
+
+/* 磨き上げられたGlassmorphismのユーティリティ */
+.glass-panel {
+  background: var(--glass);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-lg);
+  border-radius: 16px;
+}
+
+/* Leaflet Popup カスタマイズ */
+.custom-popup .leaflet-popup-content-wrapper {
+  padding: 0;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+}
+
+.custom-popup .leaflet-popup-content {
+  margin: 0;
+  width: 260px !important;
+}
+
+/* Split Layout for Trip Detail */
+.trip-detail-wrap {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  flex-direction: column; /* 縦長スマホ向け デフォルト */
+}
+
+@media (min-width: 768px) {
+  .trip-detail-wrap {
+    flex-direction: row; /* 横長パソコン向け */
+  }
+}
+
+.map-section, .gallery-section {
+  flex: 1;
+  position: relative;
+  overflow: auto;
+  transition: all 0.3s ease;
+}
+
+.gallery-section {
+  background: var(--bg);
+  border-top: 1px solid var(--border);
+}
+
+@media (min-width: 768px) {
+  .gallery-section {
+    border-top: none;
+    border-left: 1px solid var(--border);
+  }
+}
+
+.photo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 12px;
+}
+
+.gallery-photo {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: var(--shadow-sm);
+  border: 2px solid transparent;
+}
+
+.gallery-photo:hover {
+  transform: scale(1.03);
+  box-shadow: var(--shadow);
+}
+
+.gallery-photo.active {
+  border-color: var(--primary);
+  transform: scale(1.05);
+  box-shadow: 0 4px 14px 0 rgba(79, 70, 229, 0.4);
+}
+
+.expand-btn {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  z-index: 999; /* Leafletより上にする必要あり。Popupよりは下がよいので999 */
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 8px 14px;
+  font-size: 0.85rem;
+  font-weight: bold;
+  color: var(--text-main);
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: background 0.2s;
+}
+
+.expand-btn:hover {
+  background: var(--bg-gradient);
+}
+
+/* Dashboard Responsive Styles */
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
+  gap: 15px;
+}
+
+.dashboard-title {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: bold;
+  word-break: break-word;
+}
+
+.create-trip-form {
+  display: flex;
+  gap: 15px;
+}
+
+@media (max-width: 600px) {
+  .dashboard-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+    margin-bottom: 30px;
+  }
+  
+  .dashboard-title {
+    font-size: 1.6rem;
+  }
+
+  .create-trip-form {
+    flex-direction: column;
+  }
+  
+  .create-trip-form button {
+    width: 100%;
+    padding: 14px 28px !important;
+  }
+}
