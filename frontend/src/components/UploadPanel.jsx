@@ -65,7 +65,7 @@ const UploadPanel = ({ onUploadSuccess, currentUserId, currentTripId, isOpen, on
     }
     
     if (successCount < files.length) {
-      alert(`${files.length - successCount}枚のアップロードに失敗しました。`);
+      alert(`${files.length - successCount} uploads failed.`);
     }
   };
 
@@ -79,24 +79,28 @@ const UploadPanel = ({ onUploadSuccess, currentUserId, currentTripId, isOpen, on
   return (
     <div className="glass-panel" style={{
       position: 'absolute',
-      bottom: '15px',
+      bottom: '20px',
       left: '50%',
       transform: 'translateX(-50%)',
       zIndex: 9999,
-      padding: '20px',
+      padding: '25px',
       display: 'flex',
       flexDirection: 'column',
-      gap: '12px',
-      width: 'calc(100vw - 30px)',
-      maxWidth: '340px'
+      gap: '15px',
+      width: 'calc(100vw - 40px)',
+      maxWidth: '380px',
+      border: '1px solid rgba(255,255,255,0.7)'
     }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 'bold' }}>📷 写真を追加</h3>
+        <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: '900', letterSpacing: '0.05em', color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+          ADD PHOTOS
+          <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor"><path d="M480-260q75 0 127.5-52.5T660-440q0-75-52.5-127.5T480-620q-75 0-127.5 52.5T300-440q0 75 52.5 127.5T480-260Zm0-80q-42 0-71-29t-29-71q0-42 29-71t71-29q42 0 71 29t29 71q0 42-29 71t-71 29ZM160-120q-33 0-56.5-23.5T80-200v-480q0-33 23.5-56.5T160-760h126l74-80h240l74 80h126q33 0 56.5 23.5T880-680v480q0 33-23.5 56.5T800-120H160Zm0-80h640v-480H638l-73-80H395l-73 80H160v480Zm320-240Z"/></svg>
+        </h3>
         <button 
           onClick={closePanel}
-          style={{ background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: '1.2rem', cursor: 'pointer', padding: '0 5px' }}
+          style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '0 5px', display: 'flex', alignItems: 'center' }}
         >
-          ✕
+          <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor"><path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/></svg>
         </button>
       </div>
       
@@ -105,24 +109,25 @@ const UploadPanel = ({ onUploadSuccess, currentUserId, currentTripId, isOpen, on
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
         style={{
-           border: `2px dashed ${dragOver ? 'var(--primary)' : 'var(--border)'}`,
-           borderRadius: '12px',
-           padding: '15px',
+           border: `2px dashed ${dragOver ? 'var(--primary)' : 'rgba(0,0,0,0.1)'}`,
+           borderRadius: '14px',
+           padding: '25px 20px',
            textAlign: 'center',
-           background: dragOver ? 'rgba(79, 70, 229, 0.05)' : 'rgba(255,255,255,0.4)',
+           background: dragOver ? 'rgba(245, 158, 11, 0.05)' : 'rgba(255,255,255,0.5)',
            transition: 'all 0.2s',
            cursor: 'pointer'
         }}
         onClick={() => document.getElementById('photo-upload-input').click()}
       >
-        <p style={{ margin: '0 0 10px 0', fontSize: '0.9rem', color: 'var(--text-main)', fontWeight: '500' }}>
-          {files.length > 0 ? `${files.length}枚の画像を選択中` : "ここをタップして写真を選択"}
+        <p style={{ margin: '0 0 15px 0', fontSize: '1rem', color: 'var(--text-main)', fontWeight: '700' }}>
+          {files.length > 0 ? `${files.length} FILES SELECTED` : "TAP OR DRAG PHOTOS HERE"}
         </p>
         <div style={{ 
-            background: 'var(--bg-gradient)', padding: '8px 12px', borderRadius: '8px', 
-            display: 'inline-block', fontSize: '0.85rem', fontWeight: '600', border: '1px solid var(--border)', color: 'var(--primary)' 
+            background: 'white', padding: '10px 18px', borderRadius: '10px', 
+            display: 'inline-block', fontSize: '0.9rem', fontWeight: '800', border: '1px solid var(--border)', color: 'var(--text-main)',
+            boxShadow: 'var(--shadow-sm)'
         }}>
-          ファイルを探す
+          BROWSE FILES
           <input 
             id="photo-upload-input"
             type="file" 
@@ -138,18 +143,18 @@ const UploadPanel = ({ onUploadSuccess, currentUserId, currentTripId, isOpen, on
         onClick={handleUpload} 
         disabled={files.length === 0 || uploading || !currentUserId || !currentTripId}
         style={{
-          padding: '12px',
-          background: (files.length > 0 && currentUserId && currentTripId) ? 'var(--primary)' : '#cbd5e1',
-          color: 'white',
+          padding: '16px',
+          background: (files.length > 0 && currentUserId && currentTripId) ? 'var(--primary)' : '#e2e8f0',
+          color: (files.length > 0 && currentUserId && currentTripId) ? 'var(--text-main)' : '#94a3b8',
           border: 'none',
-          borderRadius: '10px',
+          borderRadius: '12px',
           cursor: (files.length > 0 && currentUserId && currentTripId) ? 'pointer' : 'not-allowed',
-          fontWeight: 'bold',
-          fontSize: '1rem',
-          boxShadow: (files.length > 0 && currentUserId && currentTripId) ? '0 4px 14px 0 rgba(79, 70, 229, 0.39)' : 'none'
+          fontWeight: '900',
+          fontSize: '1.1rem',
+          boxShadow: (files.length > 0 && currentUserId && currentTripId) ? '0 10px 15px -3px rgba(245, 158, 11, 0.4)' : 'none'
         }}
       >
-        {uploading ? '送信中...' : 'アップロード'}
+        {uploading ? 'UPLOADING...' : 'SAVE TO TRIP'}
       </button>
     </div>
   );

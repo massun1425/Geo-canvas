@@ -1,24 +1,60 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,100..900;1,100..900&display=swap');
 
 :root {
-  --primary: #4F46E5;
-  --primary-hover: #4338CA;
-  --bg-gradient: linear-gradient(135deg, #f0f4fd 0%, #e2e8f0 100%);
-  --surface: rgba(255, 255, 255, 0.9);
-  --glass: rgba(255, 255, 255, 0.85);
-  --text-main: #1F2937;
-  --text-muted: #6B7280;
-  --border: rgba(255, 255, 255, 0.5);
-  --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  --shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  --primary: #F59E0B;
+  --primary-hover: #D97706;
+  --bg-gradient: linear-gradient(135deg, #fef3c7 0%, #fffbeb 100%);
+  --surface: rgba(255, 255, 255, 0.8);
+  --glass: rgba(255, 255, 255, 0.75);
+  --text-main: #1E1B4B;
+  --text-muted: #475569;
+  --border: rgba(255, 255, 255, 0.4);
+  --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  --shadow-lg: 0 20px 40px -12px rgba(0, 0, 0, 0.15);
+}
+
+.photo-credit {
+  position: fixed;
+  bottom: 12px;
+  right: 15px;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.8);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  z-index: 9999;
+  pointer-events: none;
+  letter-spacing: 0.02em;
 }
 
 body {
   margin: 0;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-family: 'Noto Serif', serif;
   color: var(--text-main);
-  background: var(--bg-gradient);
+  background-color: #fff; /* 背景のベースを白にする */
   -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+/* 背景写真にぼかしと白基調の加工を施す */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: url('./assets/daniela-cuevas-t7YycgAoVSw-unsplash.jpg') no-repeat center center fixed;
+  background-size: cover;
+  filter: blur(12px) brightness(1.05); /* ぼかし12px */
+  opacity: 0.45; /* 白背景に馴染ませて「白っぽくぼけた」質感にする */
+  z-index: -1;
+  pointer-events: none;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Noto Serif', serif;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin-top: 0;
 }
 
 * {
@@ -26,7 +62,8 @@ body {
 }
 
 button {
-  font-family: inherit;
+  font-family: 'Noto Serif', serif;
+  font-weight: 700;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -35,17 +72,17 @@ button:active {
 }
 
 input {
-  font-family: inherit;
+  font-family: 'Noto Serif', serif;
 }
 
 /* 磨き上げられたGlassmorphismのユーティリティ */
 .glass-panel {
   background: var(--glass);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid var(--border);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.6);
   box-shadow: var(--shadow-lg);
-  border-radius: 16px;
+  border-radius: 20px;
 }
 
 /* Leaflet Popup カスタマイズ */
@@ -66,16 +103,19 @@ input {
   display: flex;
   flex: 1;
   overflow: hidden;
-  flex-direction: column; /* 縦長スマホ向け デフォルト */
+  flex-direction: column;
+  /* 縦長スマホ向け デフォルト */
 }
 
 @media (min-width: 768px) {
   .trip-detail-wrap {
-    flex-direction: row; /* 横長パソコン向け */
+    flex-direction: row;
+    /* 横長パソコン向け */
   }
 }
 
-.map-section, .gallery-section {
+.map-section,
+.gallery-section {
   flex: 1;
   position: relative;
   overflow: auto;
@@ -126,7 +166,8 @@ input {
   position: absolute;
   top: 15px;
   right: 15px;
-  z-index: 999; /* Leafletより上にする必要あり。Popupよりは下がよいので999 */
+  z-index: 999;
+  /* Leafletより上にする必要あり。Popupよりは下がよいので999 */
   background: rgba(255, 255, 255, 0.95);
   border: 1px solid var(--border);
   border-radius: 10px;
@@ -143,45 +184,66 @@ input {
   background: var(--bg-gradient);
 }
 
-/* Dashboard Responsive Styles */
-.dashboard-header {
+/* Floating Menu Styles */
+.menu-trigger {
+  position: fixed;
+  top: 30px;
+  right: 30px;
+  width: 50px;
+  height: 50px;
+  background: transparent;
+  border: none;
+  color: var(--text-main);
+  cursor: pointer;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin-bottom: 40px;
-  gap: 15px;
+  justify-content: center;
+  z-index: 10001;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 50%;
 }
 
-.dashboard-title {
-  margin: 0;
-  font-size: 2rem;
-  font-weight: bold;
-  word-break: break-word;
+.menu-trigger:hover {
+  transform: scale(1.15) rotate(5deg);
+  color: var(--primary);
+  background: rgba(255,255,255,0.2);
+  backdrop-filter: blur(5px);
 }
 
-.create-trip-form {
-  display: flex;
-  gap: 15px;
+.menu-dropdown-container {
+  position: fixed;
+  top: 90px;
+  right: 30px;
+  width: 240px;
+  z-index: 10000;
+  transform-origin: top right;
+  animation: menuAppear 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-@media (max-width: 600px) {
-  .dashboard-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 15px;
-    margin-bottom: 30px;
+@keyframes menuAppear {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(-10px);
   }
-  
-  .dashboard-title {
-    font-size: 1.6rem;
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
   }
+}
 
-  .create-trip-form {
-    flex-direction: column;
-  }
-  
-  .create-trip-form button {
-    width: 100%;
-    padding: 14px 28px !important;
-  }
+.menu-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(2px);
+  z-index: 9999;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }

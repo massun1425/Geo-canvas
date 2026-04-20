@@ -6,9 +6,9 @@ const calculateDistance = (lat1, lon1, lat2, lon2) => {
   const R = 6371; // 地球の半径(km)
   const dLat = (lat2 - lat1) * (Math.PI / 180);
   const dLon = (lon2 - lon1) * (Math.PI / 180);
-  const a = 
+  const a =
     Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) * 
+    Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) *
     Math.sin(dLon / 2) * Math.sin(dLon / 2);
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   return R * c;
@@ -35,14 +35,14 @@ const TripDetailScreen = ({ photos, fetchPhotos, currentUserId, selectedTrip, on
 
   const { totalDistance, durationText } = useMemo(() => {
     if (!photos || photos.length === 0) return { totalDistance: 0, durationText: '-' };
-    
+
     // 距離の計算
     let distance = 0;
     const validPhotos = photos.filter(p => p.latitude && p.longitude);
     for (let i = 0; i < validPhotos.length - 1; i++) {
       distance += calculateDistance(
         validPhotos[i].latitude, validPhotos[i].longitude,
-        validPhotos[i+1].latitude, validPhotos[i+1].longitude
+        validPhotos[i + 1].latitude, validPhotos[i + 1].longitude
       );
     }
 
@@ -57,25 +57,25 @@ const TripDetailScreen = ({ photos, fetchPhotos, currentUserId, selectedTrip, on
       // YYYY-MM-DDフォーマットの文字列なので辞書順アルファベット比較で最小・最大が取れる
       const minStr = validDateStrings.reduce((a, b) => a < b ? a : b);
       const maxStr = validDateStrings.reduce((a, b) => a > b ? a : b);
-      
+
       // 抽出した文字列を「UTCの完全な0時」として解釈させて差分を出す
       const minTime = Date.parse(`${minStr}T00:00:00Z`);
       const maxTime = Date.parse(`${maxStr}T00:00:00Z`);
-      
+
       // 確実に24時間の倍数の差分になるので、日またぎの回数が正確に出る
       const nights = Math.round((maxTime - minTime) / 86400000);
-      
-      durationText = nights === 0 ? "日帰り" : `${nights}泊${nights + 1}日`;
+
+      durationText = nights === 0 ? "DAY TRIP" : `${nights}N ${nights + 1}D`;
     }
 
-    return { 
-      totalDistance: distance.toFixed(1), 
-      durationText 
+    return {
+      totalDistance: distance.toFixed(1),
+      durationText
     };
   }, [photos]);
 
   const handleDeletePhoto = async (photoId) => {
-    if (!window.confirm("この写真を削除してよろしいですか？")) return;
+    if (!window.confirm("Are you sure you want to delete this photo?")) return;
 
     try {
       await axios.delete(`http://${window.location.hostname}:8080/api/photos/${photoId}`);
@@ -85,7 +85,7 @@ const TripDetailScreen = ({ photos, fetchPhotos, currentUserId, selectedTrip, on
       }
     } catch (error) {
       console.error("Error deleting photo:", error);
-      alert("削除に失敗しました。");
+      alert("Delete failed.");
     }
   };
 
@@ -108,7 +108,7 @@ const TripDetailScreen = ({ photos, fetchPhotos, currentUserId, selectedTrip, on
 
   const renderPhotoGrid = (photoArray, isClassifiedTab = false) => {
     if (photoArray.length === 0) {
-      return <div style={{ padding: '20px', gridColumn: '1 / -1', color: 'var(--text-muted)' }}>写真はありません。</div>;
+      return <div style={{ padding: '20px', gridColumn: '1 / -1', color: 'var(--text-muted)' }}>No photos yet.</div>;
     }
 
     return (
@@ -149,7 +149,7 @@ const TripDetailScreen = ({ photos, fetchPhotos, currentUserId, selectedTrip, on
   const getPhotosByDate = () => {
     const groups = {};
     photos.forEach(p => {
-      let dateStr = "日付不明";
+      let dateStr = "UNKNOWN DATE";
       if (p.captured_at) {
         dateStr = p.captured_at.substring(0, 10).replace(/-/g, '/');
       }
@@ -167,11 +167,11 @@ const TripDetailScreen = ({ photos, fetchPhotos, currentUserId, selectedTrip, on
   return (
     <div className="App" style={{ height: '100dvh', width: '100vw', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
       <header style={{
-        background: 'rgba(255,255,255,0.95)',
-        borderBottom: '1px solid var(--border)',
-        boxShadow: 'var(--shadow-sm)',
+        background: 'rgba(255,255,255,0.85)',
+        backdropFilter: 'blur(10px)',
+        borderBottom: '1px solid rgba(255,255,255,0.3)',
         zIndex: 9999,
-        padding: '12px 20px',
+        padding: '16px 20px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
@@ -193,45 +193,47 @@ const TripDetailScreen = ({ photos, fetchPhotos, currentUserId, selectedTrip, on
               boxShadow: 'inset 0 1px 2px rgba(255,255,255,0.8), 0 1px 2px rgba(0,0,0,0.05)'
             }}
           >
-            <span style={{ fontSize: '1.2rem', marginRight: '6px' }}>‹</span> 戻る
+            <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px" fill="currentColor" style={{ marginRight: '4px' }}><path d="m313-480 287 287 56-57-230-230 230-230-56-57-287 287Z"/></svg>
+            BACK
           </button>
 
           <button
             onClick={() => setIsUploadOpen(true)}
             style={{
-              padding: '8px 16px',
-              borderRadius: '20px',
-              border: '1px solid var(--primary)',
-              background: 'rgba(79, 70, 229, 0.1)',
+              padding: '10px 20px',
+              borderRadius: '12px',
+              border: 'none',
+              background: 'var(--primary)',
               cursor: 'pointer',
-              fontWeight: 'bold',
-              color: 'var(--primary)',
+              fontWeight: '900',
+              color: 'var(--text-main)',
               display: 'flex',
               alignItems: 'center',
-              gap: '6px',
+              gap: '8px',
               transition: 'all 0.2s',
-              boxShadow: 'var(--shadow-sm)'
+              boxShadow: '0 8px 15px -3px rgba(245, 158, 11, 0.4)'
             }}
           >
-            <span>📸</span> Add Pictures
+            <svg xmlns="http://www.w3.org/2000/svg" height="22px" viewBox="0 -960 960 960" width="22px" fill="currentColor"><path d="M480-260q75 0 127.5-52.5T660-440q0-75-52.5-127.5T480-620q-75 0-127.5 52.5T300-440q0 75 52.5 127.5T480-260Zm0-80q-42 0-71-29t-29-71q0-42 29-71t71-29q42 0 71 29t29 71q0 42-29 71t-71 29ZM160-120q-33 0-56.5-23.5T80-200v-480q0-33 23.5-56.5T160-760h126l74-80h240l74 80h126q33 0 56.5 23.5T880-680v480q0 33-23.5 56.5T800-120H160Zm0-80h640v-480H638l-73-80H395l-73 80H160v480Zm320-240Z" /></svg>
+            UPLOAD
           </button>
         </div>
-        <span style={{ fontWeight: '600', fontSize: '1.1rem', color: 'var(--text-main)' }}>TRIP DETAILS</span>
+        <span style={{ fontWeight: '900', fontSize: '1rem', color: 'var(--text-main)', letterSpacing: '0.05em' }}>TRIP DETAILS</span>
       </header>
 
       {/* Tabs Menu */}
-      <div style={{ display: 'flex', background: 'var(--bg)', borderBottom: '1px solid var(--border)', flexShrink: 0 }}>
+      <div style={{ display: 'flex', background: 'rgba(255,255,255,0.4)', backdropFilter: 'blur(10px)', borderBottom: '1px solid var(--border)', flexShrink: 0 }}>
         <button
           onClick={() => setActiveTab('map')}
-          style={{ flex: 1, padding: '14px', border: 'none', background: activeTab === 'map' ? 'rgba(79, 70, 229, 0.1)' : 'transparent', color: activeTab === 'map' ? 'var(--primary)' : 'var(--text-muted)', fontWeight: 'bold', cursor: 'pointer', transition: '0.2s', borderBottom: activeTab === 'map' ? '3px solid var(--primary)' : '3px solid transparent' }}
+          style={{ flex: 1, padding: '16px', border: 'none', background: activeTab === 'map' ? 'rgba(255, 255, 255, 0.3)' : 'transparent', color: 'var(--text-main)', fontWeight: '900', fontSize: '0.95rem', cursor: 'pointer', transition: '0.2s', borderBottom: activeTab === 'map' ? '4px solid var(--primary)' : '4px solid transparent' }}
         >
-          マップ📍
+          MAP VIEW
         </button>
         <button
           onClick={() => setActiveTab('classified')}
-          style={{ flex: 1, padding: '14px', border: 'none', background: activeTab === 'classified' ? 'rgba(79, 70, 229, 0.1)' : 'transparent', color: activeTab === 'classified' ? 'var(--primary)' : 'var(--text-muted)', fontWeight: 'bold', cursor: 'pointer', transition: '0.2s', borderBottom: activeTab === 'classified' ? '3px solid var(--primary)' : '3px solid transparent' }}
+          style={{ flex: 1, padding: '16px', border: 'none', background: activeTab === 'classified' ? 'rgba(255, 255, 255, 0.3)' : 'transparent', color: 'var(--text-main)', fontWeight: '900', fontSize: '0.95rem', cursor: 'pointer', transition: '0.2s', borderBottom: activeTab === 'classified' ? '4px solid var(--primary)' : '4px solid transparent' }}
         >
-          詳細とギャラリー
+          EXPLORE & GALLERY
         </button>
       </div>
 
@@ -242,8 +244,13 @@ const TripDetailScreen = ({ photos, fetchPhotos, currentUserId, selectedTrip, on
               <button
                 className="expand-btn"
                 onClick={() => setExpandedView(expandedView === 'map' ? 'none' : 'map')}
+                style={{ display: 'flex', alignItems: 'center', gap: '5px' }}
               >
-                {expandedView === 'map' ? '🔄 分割表示' : '🔍 マップ拡大'}
+                {expandedView === 'map' ? (
+                  <><svg xmlns="http://www.w3.org/2000/svg" height="18px" viewBox="0 -960 960 960" width="18px" fill="currentColor"><path d="M480-120v-720h400v720H480Zm80-80h240v-560H560v560ZM80-200v-80h320v80H80Zm0-200v-80h320v80H80Zm0-200v-80h320v80H80Z"/></svg> SPLIT VIEW</>
+                ) : (
+                  <><svg xmlns="http://www.w3.org/2000/svg" height="18px" viewBox="0 -960 960 960" width="18px" fill="currentColor"><path d="M120-120v-320h320v320H120Zm400 0v-720h320v720H520ZM120-520v-320h320v320H120Z"/></svg> EXPAND MAP</>
+                )}
               </button>
               <MapView
                 photos={photos}
@@ -259,13 +266,18 @@ const TripDetailScreen = ({ photos, fetchPhotos, currentUserId, selectedTrip, on
               <button
                 className="expand-btn"
                 onClick={() => setExpandedView(expandedView === 'gallery' ? 'none' : 'gallery')}
+                style={{ display: 'flex', alignItems: 'center', gap: '5px' }}
               >
-                {expandedView === 'gallery' ? '🔄 分割表示' : '🔍 ギャラリー拡大'}
+                {expandedView === 'gallery' ? (
+                  <><svg xmlns="http://www.w3.org/2000/svg" height="18px" viewBox="0 -960 960 960" width="18px" fill="currentColor"><path d="M480-120v-720h400v720H480Zm80-80h240v-560H560v560ZM80-200v-80h320v80H80Zm0-200v-80h320v80H80Zm0-200v-80h320v80H80Z"/></svg> SPLIT VIEW</>
+                ) : (
+                  <><svg xmlns="http://www.w3.org/2000/svg" height="18px" viewBox="0 -960 960 960" width="18px" fill="currentColor"><path d="M120-120v-320h320v320H120Zm400 0v-720h320v720H520ZM120-520v-320h320v320H120Z"/></svg> EXPAND GALLERY</>
+                )}
               </button>
 
               <div style={{ padding: '25px 20px', paddingBottom: '100px' }}>
                 <h2 style={{ marginTop: 0, marginBottom: '20px', fontSize: '1.4rem', color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  pictures ({photos.length}枚)
+                  PICTURES ({photos.length})
                 </h2>
                 {renderPhotoGrid(photos, false)}
               </div>
@@ -278,52 +290,73 @@ const TripDetailScreen = ({ photos, fetchPhotos, currentUserId, selectedTrip, on
         <div style={{ flex: 1, overflowY: 'auto', padding: '30px 20px', background: 'var(--bg)' }}>
           <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px', marginBottom: '30px' }}>
-              <div style={{ background: 'rgba(255,255,255,0.8)', padding: '20px', borderRadius: '12px', boxShadow: 'var(--shadow-sm)', textAlign: 'center' }}>
-                <div style={{ fontSize: '0.9rem', color: 'var(--text-muted)', fontWeight: 'bold' }}>📍 総移動距離</div>
-                <div style={{ fontSize: '1.8rem', fontWeight: 'bold', color: 'var(--primary)', marginTop: '8px' }}>{totalDistance} <span style={{fontSize: '1rem'}}>km</span></div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px', marginBottom: '40px' }}>
+              <div style={{ background: 'rgba(255,255,255,0.7)', padding: '30px 20px', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.8)', boxShadow: 'var(--shadow-sm)', textAlign: 'center' }}>
+                <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.1em' }}>DISTANCE</div>
+                <div style={{ fontSize: '2.4rem', fontWeight: '900', color: 'var(--text-main)', marginTop: '5px', letterSpacing: '-0.02em' }}>{totalDistance}<span style={{ fontSize: '1rem', marginLeft: '4px' }}>KM</span></div>
               </div>
-              <div style={{ background: 'rgba(255,255,255,0.8)', padding: '20px', borderRadius: '12px', boxShadow: 'var(--shadow-sm)', textAlign: 'center' }}>
-                <div style={{ fontSize: '0.9rem', color: 'var(--text-muted)', fontWeight: 'bold' }}>📅 旅行期間</div>
-                <div style={{ fontSize: '1.8rem', fontWeight: 'bold', color: 'var(--primary)', marginTop: '8px' }}>{durationText}</div>
+              <div style={{ background: 'rgba(255,255,255,0.7)', padding: '30px 20px', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.8)', boxShadow: 'var(--shadow-sm)', textAlign: 'center' }}>
+                <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.1em' }}>DURATION</div>
+                <div style={{ fontSize: '2.4rem', fontWeight: '900', color: 'var(--text-main)', marginTop: '5px', letterSpacing: '-0.02em' }}>{durationText}</div>
               </div>
-              <div style={{ background: 'rgba(255,255,255,0.8)', padding: '20px', borderRadius: '12px', boxShadow: 'var(--shadow-sm)', textAlign: 'center' }}>
-                <div style={{ fontSize: '0.9rem', color: 'var(--text-muted)', fontWeight: 'bold' }}>📸 写真枚数</div>
-                <div style={{ fontSize: '1.8rem', fontWeight: 'bold', color: 'var(--primary)', marginTop: '8px' }}>{photos.length} <span style={{fontSize: '1rem'}}>枚</span></div>
+              <div style={{ background: 'rgba(255,255,255,0.7)', padding: '30px 20px', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.8)', boxShadow: 'var(--shadow-sm)', textAlign: 'center' }}>
+                <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.1em' }}>PHOTOS</div>
+                <div style={{ fontSize: '2.4rem', fontWeight: '900', color: 'var(--text-main)', marginTop: '5px', letterSpacing: '-0.02em' }}>{photos.length}<span style={{ fontSize: '1rem', marginLeft: '4px' }}>PC</span></div>
               </div>
             </div>
 
             {/* ギャラリー表示切り替えトグル */}
             <div style={{ display: 'flex', gap: '10px', marginBottom: '30px', background: 'rgba(255,255,255,0.8)', padding: '6px', borderRadius: '12px', boxShadow: 'var(--shadow-sm)' }}>
-              <button 
+              <button
                 onClick={() => setGalleryViewMode('timeline')}
-                style={{ flex: 1, padding: '12px', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', transition: '0.2s', background: galleryViewMode === 'timeline' ? 'var(--primary)' : 'transparent', color: galleryViewMode === 'timeline' ? 'white' : 'var(--text-muted)' }}
+                style={{ flex: 1, padding: '12px', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', transition: '0.2s', background: galleryViewMode === 'timeline' ? 'var(--primary)' : 'transparent', color: galleryViewMode === 'timeline' ? 'white' : 'var(--text-muted)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
               >
-                🕒 時系列
+                <svg xmlns="http://www.w3.org/2000/svg" height="18px" viewBox="0 -960 960 960" width="18px" fill="currentColor"><path d="M440-440h80v-320h-80v320Zm0 160h80v-80h-80v80ZM120-120v-720h720v720H120Zm80-80h560v-560H200v560Zm0 0v-560 560Z"/></svg>
+                TIMELINE
               </button>
-              <button 
+              <button
                 onClick={() => setGalleryViewMode('daily')}
-                style={{ flex: 1, padding: '12px', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', transition: '0.2s', background: galleryViewMode === 'daily' ? 'var(--primary)' : 'transparent', color: galleryViewMode === 'daily' ? 'white' : 'var(--text-muted)' }}
+                style={{ flex: 1, padding: '12px', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', transition: '0.2s', background: galleryViewMode === 'daily' ? 'var(--primary)' : 'transparent', color: galleryViewMode === 'daily' ? 'white' : 'var(--text-muted)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
               >
-                📅 日付ごと
+                <svg xmlns="http://www.w3.org/2000/svg" height="18px" viewBox="0 -960 960 960" width="18px" fill="currentColor"><path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-800h40v-80h80v80h320v-80h80v80h40q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T780-120H200Zm0-80h580v-400H200v400Zm0-480h580v-80H200v80Zm0 0v-80 80Z"/></svg>
+                BY DATE
               </button>
-              <button 
+              <button
                 onClick={() => setGalleryViewMode('ai')}
-                style={{ flex: 1, padding: '12px', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', transition: '0.2s', background: galleryViewMode === 'ai' ? 'var(--primary)' : 'transparent', color: galleryViewMode === 'ai' ? 'white' : 'var(--text-muted)' }}
+                style={{ flex: 1, padding: '12px', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', transition: '0.2s', background: galleryViewMode === 'ai' ? 'var(--primary)' : 'transparent', color: galleryViewMode === 'ai' ? 'white' : 'var(--text-muted)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
               >
-                ✨ AI分類
+                <svg xmlns="http://www.w3.org/2000/svg" height="18px" viewBox="0 -960 960 960" width="18px" fill="currentColor"><path d="M480-480q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47ZM160-160v-80q0-34 17.5-62.5T224-344q67-33 133-44.5t133-11.5q67 0 133 11.5t133 44.5q29 13 46.5 41.5T720-240v80H160Zm80-80h400v-3q0-12-8.5-24T610-281q-53-26-103-37.5T410-330q-50 0-100 11.5T210-281q-13 7-21.5 19t-8.5 24v3Zm240-320q33 0 56.5-23.5T560-560q0-33-23.5-56.5T480-640q-33 0-56.5 23.5T400-560q0 33 23.5 56.5T480-480Zm0-80Zm0 400Z"/></svg>
+                AI CLASSIFIED
               </button>
             </div>
 
-            <p style={{ background: 'rgba(79, 70, 229, 0.1)', padding: '15px', borderRadius: '12px', border: '1px solid rgba(79, 70, 229, 0.3)', color: 'var(--primary)', fontWeight: 'bold', marginBottom: '30px' }}>
-              💡 写真をタップすると全画面表示、長押し（PCは右クリック）で削除できます。
-              {galleryViewMode === 'ai' && <><br/>※AI（YOLOv8）が「人物」「食事」「風景」の３つに自動でカテゴリ分けしています。</>}
+            <p style={{ 
+              background: 'rgba(0, 0, 0, 0.03)', 
+              padding: '16px 20px', 
+              borderRadius: '12px', 
+              border: '1px solid rgba(0, 0, 0, 0.08)', 
+              color: 'var(--text-main)', 
+              fontSize: '0.9rem',
+              lineHeight: '1.6',
+              fontWeight: '600', 
+              marginBottom: '35px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '4px'
+            }}>
+              <span>• Tap a photo for full screen.</span>
+              <span>• Long press (right-click on PC) to delete.</span>
+              {galleryViewMode === 'ai' && (
+                <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '4px', fontWeight: '500' }}>
+                  *AI (YOLOv8) automatically categorizes photos into "People", "Food", and "Scenery".
+                </span>
+              )}
             </p>
 
             <div style={{ paddingBottom: '100px' }}>
               {galleryViewMode === 'timeline' && (
                 <>
-                  <h2 style={{ color: 'var(--text-main)', marginBottom: '20px', fontSize: '1.4rem', borderBottom: '2px solid var(--border)', paddingBottom: '10px' }}>すべての写真</h2>
+                  <h2 style={{ color: 'var(--text-main)', marginBottom: '20px', fontSize: '1.4rem', borderBottom: '2px solid var(--border)', paddingBottom: '10px' }}>ALL PHOTOS</h2>
                   {renderPhotoGrid(photos, true)}
                 </>
               )}
@@ -331,7 +364,10 @@ const TripDetailScreen = ({ photos, fetchPhotos, currentUserId, selectedTrip, on
               {galleryViewMode === 'daily' && (
                 Object.entries(getPhotosByDate()).map(([dateStr, dailyPhotos]) => (
                   <div key={dateStr}>
-                    <h2 style={{ color: 'var(--text-main)', marginBottom: '20px', fontSize: '1.4rem', borderBottom: '2px solid var(--border)', paddingBottom: '10px' }}>🗓 {dateStr}</h2>
+                    <h2 style={{ color: 'var(--text-main)', marginBottom: '20px', fontSize: '1.4rem', borderBottom: '2px solid var(--border)', paddingBottom: '10px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor"><path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-800h40v-80h80v80h320v-80h80v80h40q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T780-120H200Zm0-80h580v-400H200v400Zm0-480h580v-80H200v80Zm0 0v-80 80Z"/></svg>
+                      {dateStr}
+                    </h2>
                     <div style={{ marginBottom: '30px' }}>
                       {renderPhotoGrid(dailyPhotos, true)}
                     </div>
@@ -341,13 +377,22 @@ const TripDetailScreen = ({ photos, fetchPhotos, currentUserId, selectedTrip, on
 
               {galleryViewMode === 'ai' && (
                 <>
-                  <h2 style={{ color: 'var(--text-main)', marginBottom: '20px', fontSize: '1.4rem', borderBottom: '2px solid var(--border)', paddingBottom: '10px' }}>🧍 人物・ポートレート</h2>
+                  <h2 style={{ color: 'var(--text-main)', marginBottom: '20px', fontSize: '1.4rem', borderBottom: '2px solid var(--border)', paddingBottom: '10px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor"><path d="M480-480q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47ZM160-160v-80q0-34 17.5-62.5T224-344q67-33 133-44.5t133-11.5q67 0 133 11.5t133 44.5q29 13 46.5 41.5T720-240v80H160Zm80-80h400v-3q0-12-8.5-24T610-281q-53-26-103-37.5T410-330q-50 0-100 11.5T210-281q-13 7-21.5 19t-8.5 24v3Zm240-320q33 0 56.5-23.5T560-560q0-33-23.5-56.5T480-640q-33 0-56.5 23.5T400-560q0 33 23.5 56.5T480-480Zm0-80Zm0 400Z"/></svg>
+                    PEOPLE & PORTRAITS
+                  </h2>
                   {renderPhotoGrid(photos.filter(p => p.ml_category === 'person'), true)}
 
-                  <h2 style={{ color: 'var(--text-main)', marginBottom: '20px', fontSize: '1.4rem', borderBottom: '2px solid var(--border)', paddingBottom: '10px' }}>🍽️ 食事・レストラン</h2>
+                  <h2 style={{ color: 'var(--text-main)', marginBottom: '20px', fontSize: '1.4rem', borderBottom: '2px solid var(--border)', paddingBottom: '10px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor"><path d="M160-120v-280q0-83 58.5-141.5T360-600v-280h80v280h40v-280h80v280h40v-280h80v280q0 83-58.5 141.5T520-400v280h-80v-280h-80v280h-200Zm400-80h320v-80H560v80Zm0-120h320v-80H560v80Zm0-120h320v-80H560v80Z"/></svg>
+                    FOOD & RESTAURANTS
+                  </h2>
                   {renderPhotoGrid(photos.filter(p => p.ml_category === 'food'), true)}
 
-                  <h2 style={{ color: 'var(--text-main)', marginBottom: '20px', fontSize: '1.4rem', borderBottom: '2px solid var(--border)', paddingBottom: '10px' }}>🏞️ 風景・その他</h2>
+                  <h2 style={{ color: 'var(--text-main)', marginBottom: '20px', fontSize: '1.4rem', borderBottom: '2px solid var(--border)', paddingBottom: '10px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor"><path d="M120-120v-80h720v80H120Zm160-120-160-240 102-153 178 267h-120Zm220 0-140-210 132-198 288 432h-280Z"/></svg>
+                    SCENERY & OTHERS
+                  </h2>
                   {renderPhotoGrid(photos.filter(p => p.ml_category !== 'person' && p.ml_category !== 'food'), true)}
                 </>
               )}
@@ -359,31 +404,31 @@ const TripDetailScreen = ({ photos, fetchPhotos, currentUserId, selectedTrip, on
 
       {/* フルスクリーンモーダル */}
       {fullScreenPhoto && (
-        <div 
-          style={{ 
-            position: 'fixed', 
-            top: 0, left: 0, right: 0, bottom: 0, 
-            background: 'rgba(0,0,0,0.85)', 
+        <div
+          style={{
+            position: 'fixed',
+            top: 0, left: 0, right: 0, bottom: 0,
+            background: 'rgba(0,0,0,0.85)',
             backdropFilter: 'blur(8px)',
-            zIndex: 100000, 
-            display: 'flex', 
-            alignItems: 'center', 
-            justifyContent: 'center', 
+            zIndex: 100000,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
             cursor: 'zoom-out',
             animation: 'fadeIn 0.2s ease-out'
           }}
           onClick={() => setFullScreenPhoto(null)}
         >
-          <img 
-            src={`http://${window.location.hostname}:8080/api/photos/${fullScreenPhoto.id}/image?user_id=${currentUserId}`} 
-            style={{ 
-              maxWidth: '96%', 
-              maxHeight: '90%', 
+          <img
+            src={`http://${window.location.hostname}:8080/api/photos/${fullScreenPhoto.id}/image?user_id=${currentUserId}`}
+            style={{
+              maxWidth: '96%',
+              maxHeight: '90%',
               objectFit: 'contain',
               borderRadius: '8px',
               boxShadow: '0 10px 30px rgba(0,0,0,0.5)'
-            }} 
-            alt="Fullscreen" 
+            }}
+            alt="Fullscreen"
           />
           <style>{`@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }`}</style>
         </div>

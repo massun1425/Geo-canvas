@@ -9,7 +9,7 @@ import axios from 'axios';
 
 // 緯度経度から住所（県・市）を取得して表示するコンポーネント
 const LocationName = ({ latitude, longitude }) => {
-  const [address, setAddress] = useState('📍 場所を特定中...');
+  const [address, setAddress] = useState('Locating...');
 
   useEffect(() => {
     let isMounted = true;
@@ -23,10 +23,10 @@ const LocationName = ({ latitude, longitude }) => {
           const city = data.address.city || data.address.town || data.address.village || data.address.suburb || data.address.county || '';
           const locationString = `${pref} ${city}`.trim();
           
-          setAddress(locationString ? `📍 ${locationString}` : '📍 詳細な場所不明');
+          setAddress(locationString ? locationString : 'Location unknown');
         }
       } catch (error) {
-        if (isMounted) setAddress('📍 場所取得エラー');
+        if (isMounted) setAddress('Location error');
       }
     };
     
@@ -63,7 +63,7 @@ function MapAutoFitter({ photos }) {
   return null;
 }
 
-// マウスパッド（ホイール）のスクロールを「移動（パン）」に割り当てるコンポーネント
+// マウスパッド（ホイール）のスクロールを「移動（パン）」に割りあてるコンポーネント
 function MapScrollToPan() {
   const map = useMap();
   
@@ -133,9 +133,9 @@ const createCustomClusterIcon = (cluster) => {
 };
 
 const formatDateTime = (isoString) => {
-  if (!isoString) return '日付不明';
+  if (!isoString) return 'UNKNOWN DATE';
   const localIsoString = isoString.replace(/(Z|[+-]\d{2}:\d{2}(:\d{2})?)$/, '');
-  return new Date(localIsoString).toLocaleString('ja-JP', { 
+  return new Date(localIsoString).toLocaleString('en-US', { 
     year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute:'2-digit' 
   });
 };
@@ -151,7 +151,10 @@ const PhotoPopupContent = ({ photo, currentUserId, onDelete }) => (
     />
     <div style={{ padding: '8px 12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'white' }}>
       <div style={{ display: 'flex', flexDirection: 'column' }}>
-        <LocationName latitude={photo.latitude} longitude={photo.longitude} />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '3px', marginBottom: '2px' }}>
+          <svg xmlns="http://www.w3.org/2000/svg" height="14px" viewBox="0 -960 960 960" width="14px" fill="#6B7280"><path d="M480-480q33 0 56.5-23.5T560-560q0-33-23.5-56.5T480-640q-33 0-56.5 23.5T400-560q0 33 23.5 56.5T480-480Zm0 440q-10-14-118.5-131T253-472q0-95 66.5-161.5T481-700q95 0 161.5 66.5T709-472q0 95-114 213T480-40Zm0-80q75-73 117.5-139t42.5-113q0-74-51-125t-124-51q-73 0-124 51t-51 125q0 47 42.5 113T480-120Z"/></svg>
+          <LocationName latitude={photo.latitude} longitude={photo.longitude} />
+        </div>
         <span style={{ margin: 0, fontSize: '0.75rem', color: 'var(--text-main)', fontWeight: '600' }}>
           {formatDateTime(photo.captured_at)}
         </span>
@@ -166,16 +169,15 @@ const PhotoPopupContent = ({ photo, currentUserId, onDelete }) => (
           cursor: 'pointer', fontSize: '0.9rem', padding: '5px 8px', borderRadius: '6px',
           display: 'flex', alignItems: 'center', transition: 'background 0.2s'
         }}
-        title="この写真を削除"
+        title="Delete this photo"
       >
-        🗑️
+        <svg xmlns="http://www.w3.org/2000/svg" height="18px" viewBox="0 -960 960 960" width="18px" fill="currentColor"><path d="M280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160 0h80v-360h-80v360ZM280-720v520-520Z"/></svg>
       </button>
     </div>
   </div>
 );
 
 // 【案A】ポップアップのオンデマンド読み込み用コンポーネント
-// 裏側での大量の通信とDOM作成を防ぎ、クリックされた時だけ要素を作成する
 const PhotoMarker = ({ photo, currentUserId, onDelete, markerRefs }) => {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -209,13 +211,13 @@ const MapView = ({ photos, onDeleteSuccess, currentUserId, activePhotoId }) => {
 
   // 削除処理もメモ化（子コンポーネントへのpropsの再生成を防ぐ）
   const handleDelete = useCallback(async (photoId) => {
-    if (!window.confirm("この写真を削除してよろしいですか？")) return;
+    if (!window.confirm("Are you sure you want to delete this photo?")) return;
     try {
       await axios.delete(`http://${window.location.hostname}:8080/api/photos/${photoId}`);
       if (onDeleteSuccess) onDeleteSuccess();
     } catch (error) {
       console.error("Error deleting photo:", error);
-      alert("削除に失敗しました。");
+      alert("Deletion failed.");
     }
   }, [onDeleteSuccess]);
 
@@ -227,7 +229,6 @@ const MapView = ({ photos, onDeleteSuccess, currentUserId, activePhotoId }) => {
   }, [photos]);
 
   // 【案B】重い地図要素（何百ものピンとクラスタ）全体を完全にキャッシュ（メモ化）
-  // photos配列自体が更新された時だけ再計算する
   const mapOverlayElements = useMemo(() => {
     return (
       <>

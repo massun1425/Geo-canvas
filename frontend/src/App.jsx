@@ -57,23 +57,25 @@ function App() {
     setCurrentView("dashboard");
   };
 
-  if (currentView === "auth") {
-    return <AuthScreen onLoginSuccess={handleLoginSuccess} />
-  }
-
-  if (currentView === "dashboard") {
-    return <DashboardScreen user={loggedInUser} onSelectTrip={handleSelectTrip} onLogout={handleLogout} />
-  }
-
-  // currentView === "map" の場合
   return (
-    <TripDetailScreen 
-      photos={photos} 
-      fetchPhotos={fetchPhotos} 
-      currentUserId={loggedInUser?.id}
-      selectedTrip={selectedTrip}
-      onBack={handleBackToDashboard}
-    />
+    <>
+      {currentView === "auth" && <AuthScreen onLoginSuccess={handleLoginSuccess} />}
+      {currentView === "dashboard" && (
+        <DashboardScreen user={loggedInUser} onSelectTrip={handleSelectTrip} onLogout={handleLogout} />
+      )}
+      {currentView === "map" && (
+        <TripDetailScreen 
+          photos={photos} 
+          fetchPhotos={fetchPhotos} 
+          currentUserId={loggedInUser?.id}
+          selectedTrip={selectedTrip}
+          onBack={handleBackToDashboard}
+        />
+      )}
+      <div className="photo-credit">
+        Photo by Daniela Cuevas on Unsplash
+      </div>
+    </>
   )
 }
 
