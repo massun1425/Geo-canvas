@@ -90,7 +90,7 @@ async def upload_photo(
             f.write(file_bytes)
     
     # 3. 機械学習による画像分類 (YOLOv8推論)
-    ml_category = classify_photo(file_path)
+    ml_category, ml_tags = classify_photo(file_path)
     
     # 4. DBへ保存
     new_photo = models.Photo(
@@ -101,6 +101,7 @@ async def upload_photo(
         longitude=exif_info["longitude"],
         captured_at=exif_info["captured_at"],
         ml_category=ml_category,
+        ml_tags=ml_tags,
         is_analyzed=True
     )
     
@@ -165,5 +166,24 @@ def delete_photo(photo_id: uuid.UUID, db: Session = Depends(get_db)):
     db.delete(photo)
     db.commit()
     return {"message": "Photo deleted successfully"}
+
+@router.get("/reanalyze/{trip_id}")
+def reanalyze_trip_photos(trip_id: uuid.UUID, db: Session = Depends(get_db)):
+    """
+    指定された旅行の全写真を再解析し、最新のYOLOタグを付与するAPI
+    """
+    photos = db.query(models.Photo).filter(models.Photo.trip_id == trip_id).all()
+    
+    count = 0
+    for p in photos:
+        if p.image_url and os.path.exists(p.image_url):
+            category, tags = classify_photo(p.image_url)
+            p.ml_category = category
+            p.ml_tags = tags
+            p.is_analyzed = True
+            count += 1
+            
+    db.commit()
+    return {"message": f"Successfully re-analyzed {count} photos", "count": count}
 
 

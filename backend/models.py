@@ -48,6 +48,7 @@ class Photo(Base):
     
     # 機械学習連携用
     ml_category = Column(String(50), nullable=True)
+    ml_tags = Column(Text, nullable=True) # カンマ区切りのタグを保存用
     is_analyzed = Column(Boolean, default=False)
     
     created_at = Column(DateTime(timezone=True), server_default=func.now())
