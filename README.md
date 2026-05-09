@@ -26,6 +26,10 @@ https://github.com/user-attachments/assets/4db07cd5-4305-47ac-ac1c-9ebefa8ed933
 <!-- TODO: GIF（写真アップロード〜マップ表示の流れ） -->
 <!-- ![demo-map](docs/gifs/02_photos_and_map.gif) -->
 
+
+https://github.com/user-attachments/assets/5512c71d-28b7-4f9a-9f04-c2a887844982
+
+
 旅行を選択すると詳細画面が開き、**MAP** タブが表示されます。
 
 - **写真のアップロード**: 右パネルの「+」ボタンからGPS情報（EXIF）付きの写真を複数枚まとめてアップロードできます。
@@ -39,6 +43,10 @@ https://github.com/user-attachments/assets/4db07cd5-4305-47ac-ac1c-9ebefa8ed933
 
 <!-- TODO: GIF（各タブの機能紹介） -->
 <!-- ![demo-features](docs/gifs/03_explore_ai_smart.gif) -->
+
+
+https://github.com/user-attachments/assets/53d88b16-9295-47f8-8a6a-62a9e171e193
+
 
 旅行詳細画面の上部タブから以下の機能にアクセスできます。
 
