@@ -12,6 +12,8 @@
 <!-- TODO: GIF（アカウント作成〜旅行作成までの流れ） -->
 <!-- ![demo-account](docs/gifs/01_account_and_trip.gif) -->
 
+https://github.com/user-attachments/assets/4db07cd5-4305-47ac-ac1c-9ebefa8ed933
+
 - **アカウント作成**: メールアドレスとパスワードで新規登録できます。
 - **ログイン**: 登録済みのアカウントでログインし、ダッシュボードへアクセスします。
 - **旅行作成**: ダッシュボードの「CREATE NEW TRIP」セクションに旅行名を入力して `START` を押すと、新しい旅行が作成されます。
