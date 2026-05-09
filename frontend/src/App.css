@@ -98,6 +98,27 @@ input {
   width: 260px !important;
 }
 
+/* Create Trip Form - Responsive */
+.create-trip-form {
+  flex-direction: column !important;
+  align-items: stretch !important;
+}
+
+.create-trip-form button[type="submit"] {
+  width: 100%;
+}
+
+@media (min-width: 600px) {
+  .create-trip-form {
+    flex-direction: row !important;
+    align-items: center !important;
+  }
+
+  .create-trip-form button[type="submit"] {
+    width: auto;
+  }
+}
+
 /* Split Layout for Trip Detail */
 .trip-detail-wrap {
   display: flex;
